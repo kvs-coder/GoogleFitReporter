@@ -160,6 +160,9 @@ data class AggregateResult(
     }
 
     companion object {
+        const val APP_PACKAGE_NAME = "com.google.android.gms"
+        const val STEPS_STREAM_NAME = "estimated_steps"
+
         internal fun createFrom(
             dataSet: com.google.android.gms.fitness.data.DataSet,
         ) = AggregateResult(

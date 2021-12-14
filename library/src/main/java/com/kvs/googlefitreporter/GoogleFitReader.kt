@@ -29,7 +29,7 @@ class GoogleFitReader(
 
     @Throws(IllegalStateException::class)
     fun readTotalDaily(type: HealthType): AggregateResult {
-        val task = Fitness.getHistoryClient(activity, account).readDailyTotal(type.original)
+        val task = Fitness.getHistoryClient(activity, account).readDailyTotal(type.originalType)
         val response = Tasks.await(task)
         return AggregateResult.createFrom(response)
     }
