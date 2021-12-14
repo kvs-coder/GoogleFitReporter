@@ -55,10 +55,17 @@ class GoogleFitReader(
         val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
         val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
 
+        val datasource = DataSource.Builder()
+            .setAppPackageName("com.google.android.gms")
+            .setDataType(DataType.AGGREGATE_STEP_COUNT_DELTA)
+            .setType(DataSource.TYPE_DERIVED)
+            .setStreamName("estimated_steps")
+            .build()
+
         val readRequest = DataReadRequest.Builder()
-            .aggregate(DataType.AGGREGATE_STEP_COUNT_DELTA)
+            .aggregate(datasource)
             .setTimeRange(startSeconds, endSeconds, TimeUnit.SECONDS)
-            .enableServerQueries()
+            //.enableServerQueries()
             .bucketByTime(1, TimeUnit.DAYS)
             .build()
         Fitness.getHistoryClient(activity, account)
@@ -74,13 +81,13 @@ class GoogleFitReader(
             }
             .addOnFailureListener { e -> Log.d("AGGREGATE", "OnFailure()", e) }
 
-        Fitness.getHistoryClient(activity, account)
-            .readDailyTotal(DataType.AGGREGATE_STEP_COUNT_DELTA)
-            .addOnSuccessListener { dataSet ->
-                // Use response data here
-                Log.i("AGGREGATE", "AGGREGATE OnSuccess()")
-                dumpDataSet(dataSet)
-            }
+//        Fitness.getHistoryClient(activity, account)
+//            .readDailyTotal(DataType.AGGREGATE_STEP_COUNT_DELTA)
+//            .addOnSuccessListener { dataSet ->
+//                // Use response data here
+//                Log.i("AGGREGATE", "AGGREGATE OnSuccess()")
+//                dumpDataSet(dataSet)
+//            }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
