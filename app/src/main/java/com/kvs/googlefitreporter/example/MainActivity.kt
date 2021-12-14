@@ -19,21 +19,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         reporter = GoogleFitReporter(this)
         reporter.manager.authorize(
-            toReadTypes = setOf(DataType.AGGREGATE_STEP_COUNT_DELTA),
+            toReadTypes = setOf(DataType.AGGREGATE_STEP_COUNT_DELTA, DataType.TYPE_STEP_COUNT_DELTA),
             toWriteTypes = setOf(DataType.AGGREGATE_STEP_COUNT_DELTA)
         )
         if (reporter.manager.hasPermissions()) {
-            reporter.reader.accessGoogleFit()
+            reporter.reader.aggregate()
         } else {
             reporter.manager.requestPermissions()
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
             Activity.RESULT_OK -> when (requestCode) {
-                GOOGLE_FIT_REPORTER_PERMISSIONS_REQUEST_CODE -> reporter.reader.accessGoogleFit()
+                GOOGLE_FIT_REPORTER_PERMISSIONS_REQUEST_CODE -> reporter.reader.aggregate()
                 else -> {
                     // Result wasn't from Google Fit
                 }
