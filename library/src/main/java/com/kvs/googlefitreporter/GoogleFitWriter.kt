@@ -24,4 +24,17 @@ class GoogleFitWriter(
         return task.isSuccessful
     }
 
+    @Throws(IllegalStateException::class)
+    fun updateData(
+        type: HealthType,
+        insertResult: InsertResult,
+        startTime: Long,
+        endTime: Long
+    ): Boolean {
+        val request = ResolverFactory.createFrom(type).createDataUpdateRequest(insertResult, startTime, endTime)
+        val task = Fitness.getHistoryClient(activity, account).updateData(request)
+        Tasks.await(task)
+        return task.isSuccessful
+    }
+
 }

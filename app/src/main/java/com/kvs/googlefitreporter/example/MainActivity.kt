@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         thread {
             try {
                 insertDataSteps()
+                updateDataSteps()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -114,6 +115,26 @@ class MainActivity : AppCompatActivity() {
         )
         val isSuccessful = reporter.writer.insertData(HealthType.STEPS, insertResult)
         Log.i(TAG, "Insert $isSuccessful")
+    }
+
+    private fun updateDataSteps() {
+        val end = LocalDateTime.now()
+        val start = end.minusHours(1)
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val insertResult = InsertResult(
+            applicationContext.packageName,
+            "steps_on_fly",
+            100,
+            startSeconds,
+            endSeconds
+        )
+        val endOfTheDay = LocalDateTime.now().plusHours(1)
+        val startOfTheDay = end.minusHours(3)
+        val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val isSuccessful = reporter.writer.updateData(HealthType.STEPS, insertResult, startOfTheDaySeconds, endOfTheDaySeconds)
+        Log.i(TAG, "Update $isSuccessful")
     }
 
 }

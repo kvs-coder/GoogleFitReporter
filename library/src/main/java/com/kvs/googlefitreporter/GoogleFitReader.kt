@@ -6,7 +6,6 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.tasks.Tasks
 import com.kvs.googlefitreporter.model.AggregateResult
 import com.kvs.googlefitreporter.model.HealthType
-import com.kvs.googlefitreporter.model.InsertResult
 import com.kvs.googlefitreporter.resolver.ResolverFactory
 
 class GoogleFitReader(
