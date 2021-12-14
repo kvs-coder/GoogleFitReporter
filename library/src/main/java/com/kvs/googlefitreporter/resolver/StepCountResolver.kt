@@ -1,6 +1,7 @@
 package com.kvs.googlefitreporter.resolver
 
 import com.google.android.gms.fitness.data.*
+import com.google.android.gms.fitness.request.DataDeleteRequest
 import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.android.gms.fitness.request.DataUpdateRequest
 import com.kvs.googlefitreporter.model.InsertResult
@@ -14,8 +15,9 @@ internal class StepCountResolver : CommonResolver {
     }
 
     @Throws(ClassCastException::class)
-    override fun createInsertDataSet(insertResult: InsertResult) = createDataSet(insertResult)
+    override fun createInsertDataSet(insertResult: InsertResult): DataSet = createDataSet(insertResult)
 
+    @Throws(ClassCastException::class)
     override fun createDataUpdateRequest(
         insertResult: InsertResult,
         startTime: Long,
@@ -27,6 +29,12 @@ internal class StepCountResolver : CommonResolver {
             .setTimeInterval(startTime, endTime, TimeUnit.SECONDS)
             .build()
     }
+
+    override fun createDataDeleteRequest(startTime: Long, endTime: Long): DataDeleteRequest =
+        DataDeleteRequest.Builder()
+            .setTimeInterval(startTime, endTime, TimeUnit.SECONDS)
+            .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
+            .build()
 
     override fun createAggregateRequest(startTime: Long, endTime: Long): DataReadRequest {
         val datasource = DataSource.Builder()

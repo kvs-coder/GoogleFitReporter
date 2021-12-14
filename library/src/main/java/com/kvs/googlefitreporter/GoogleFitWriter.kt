@@ -37,4 +37,16 @@ class GoogleFitWriter(
         return task.isSuccessful
     }
 
+    @Throws(IllegalStateException::class)
+    fun deleteData(
+        type: HealthType,
+        startTime: Long,
+        endTime: Long
+    ): Boolean {
+        val request = ResolverFactory.createFrom(type).createDataDeleteRequest(startTime, endTime)
+        val task = Fitness.getHistoryClient(activity, account).deleteData(request)
+        Tasks.await(task)
+        return task.isSuccessful
+    }
+
 }

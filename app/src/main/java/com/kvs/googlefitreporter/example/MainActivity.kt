@@ -40,7 +40,8 @@ class MainActivity : AppCompatActivity() {
         )
         if (reporter.manager.hasPermissions()) {
             //getGFitData()
-            saveGFitData()
+            //saveGFitData()
+            deleteGFitData()
         } else {
             reporter.manager.requestPermissions()
         }
@@ -67,6 +68,16 @@ class MainActivity : AppCompatActivity() {
             try {
                 insertDataSteps()
                 updateDataSteps()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun deleteGFitData() {
+        thread {
+            try {
+                deleteDataSteps()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -130,11 +141,20 @@ class MainActivity : AppCompatActivity() {
             endSeconds
         )
         val endOfTheDay = LocalDateTime.now().plusHours(1)
-        val startOfTheDay = end.minusHours(3)
+        val startOfTheDay = endOfTheDay.minusHours(3)
         val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
         val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
         val isSuccessful = reporter.writer.updateData(HealthType.STEPS, insertResult, startOfTheDaySeconds, endOfTheDaySeconds)
         Log.i(TAG, "Update $isSuccessful")
+    }
+
+    private fun deleteDataSteps() {
+        val endOfTheDay = LocalDateTime.now().plusHours(2)
+        val startOfTheDay = endOfTheDay.minusHours(4)
+        val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val isSuccessful = reporter.writer.deleteData(HealthType.STEPS, startOfTheDaySeconds, endOfTheDaySeconds)
+        Log.i(TAG, "Delete $isSuccessful")
     }
 
 }
