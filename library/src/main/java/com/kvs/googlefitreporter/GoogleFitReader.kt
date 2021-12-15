@@ -15,11 +15,11 @@ class GoogleFitReader(
 
     @Throws(IllegalStateException::class)
     fun aggregate(
-        type: HealthType,
+        healthType: HealthType,
         startTime: Long,
         endTime: Long
     ): List<AggregateResult> {
-        val readRequest = ResolverFactory.createFrom(type).createAggregateRequest(startTime, endTime)
+        val readRequest = ResolverFactory.create().createAggregateRequest(healthType, startTime, endTime)
         val task = Fitness.getHistoryClient(activity, account).readData(readRequest)
         val response = Tasks.await(task).buckets
         return response
@@ -28,8 +28,8 @@ class GoogleFitReader(
     }
 
     @Throws(IllegalStateException::class)
-    fun readTotalDaily(type: HealthType): AggregateResult {
-        val task = Fitness.getHistoryClient(activity, account).readDailyTotal(type.originalType)
+    fun readTotalDaily(healthType: HealthType): AggregateResult {
+        val task = Fitness.getHistoryClient(activity, account).readDailyTotal(healthType.asOriginal())
         val response = Tasks.await(task)
         return AggregateResult.createFrom(response)
     }

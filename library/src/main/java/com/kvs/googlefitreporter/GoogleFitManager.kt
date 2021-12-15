@@ -10,7 +10,6 @@ class GoogleFitManager(private val activity: Activity) {
 
     companion object {
         const val GOOGLE_FIT_REPORTER_PERMISSIONS_REQUEST_CODE = 1000
-        const val TAG = "GoogleFitReporter"
     }
 
     private lateinit var fitnessOptions: FitnessOptions
