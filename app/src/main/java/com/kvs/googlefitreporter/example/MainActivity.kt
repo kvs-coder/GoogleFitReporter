@@ -95,10 +95,10 @@ class MainActivity : AppCompatActivity() {
     private fun getGFitData() {
         thread {
             try {
-                //readDailyTotalSteps()
-                //aggregateSteps()
-                readDailyTotalHeartRateBPM()
-                aggregateHeartRateBPM()
+                readDailyTotalSteps()
+                aggregateSteps()
+                //readDailyTotalHeartRateBPM()
+                //aggregateHeartRateBPM()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
