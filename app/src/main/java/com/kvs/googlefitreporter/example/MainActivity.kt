@@ -10,13 +10,11 @@ import androidx.annotation.RequiresApi
 import com.kvs.googlefitreporter.GoogleFitManager.Companion.GOOGLE_FIT_REPORTER_PERMISSIONS_REQUEST_CODE
 import com.kvs.googlefitreporter.GoogleFitReporter
 import com.kvs.googlefitreporter.model.ActivityProperty
-import com.kvs.googlefitreporter.model.ActivityType
+import com.kvs.googlefitreporter.model.AggregateType
+import com.kvs.googlefitreporter.model.DetailType
 import com.kvs.googlefitreporter.model.InsertResult
 import java.lang.Exception
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
+import java.time.*
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -33,22 +31,34 @@ class MainActivity : AppCompatActivity() {
 
         reporter = GoogleFitReporter(this)
         reporter.manager.authorize(
-            toReadTypes = setOf(
-                ActivityType.STEP_COUNT_DELTA,
-                ActivityType.HEART_RATE_BPM,
-                ActivityType.HEART_POINTS,
-                ActivityType.HEART_POINTS_SUMMARY,
-                ActivityType.HEART_RATE_SUMMARY,
-                ActivityType.CALORIES_EXPENDED,
-            ),
-            toWriteTypes = setOf(ActivityType.STEP_COUNT_DELTA, ActivityType.HEART_RATE_BPM)
+            toReadTypes = AggregateType.values().toSet(),
+            toWriteTypes = DetailType.values().toSet()
         )
         if (reporter.manager.hasPermissions()) {
             getGFitData()
-            //saveGFitData()
-            //deleteGFitData()
+            saveGFitData()
+            deleteGFitData()
         } else {
             reporter.manager.requestPermissions()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun aggregateAll() {
+        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
+        val start = end.minusYears(1)
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        AggregateType.values().toSet().forEach { healthType ->
+            val results = reporter.reader.aggregate(healthType, startSeconds, endSeconds)
+            results.forEach {
+
+                if (it.dataPoints.count() > 0) {
+                    Log.i(TAG, "Aggregate ${healthType.string}}: ${it.json}")
+                    Log.i(TAG, "Aggregate ${healthType.string}}: ${it.dataPoints.count()}")
+                }
+
+            }
         }
     }
 
@@ -94,13 +104,7 @@ class MainActivity : AppCompatActivity() {
     private fun getGFitData() {
         thread {
             try {
-                //readSteps()
-                //readDailyTotalSteps()
-                //aggregateSteps()
-                //readDailyTotalHeartRateBPM()
-                //aggregateHeartRateBPM()
-
-                aggregateCalories()
+                aggregateAll()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -109,77 +113,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun aggregateSteps() {
-        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
-        val start = end.minusYears(1)
-        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val results = reporter.reader.aggregate(ActivityType.STEP_COUNT_DELTA, startSeconds, endSeconds)
-        results.forEach {
-            Log.i(TAG, "Aggregate STEPS: ${it.json}")
-            Log.i(TAG, "Aggregate DP COUNT: ${it.dataPoints.count()}")
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun aggregateCalories() {
-        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
-        val start = end.minusYears(1)
-        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val results = reporter.reader.aggregate(ActivityType.CALORIES_EXPENDED, startSeconds, endSeconds)
-        results.forEach {
-            Log.i(TAG, "Aggregate CALORIES: ${it.json}")
-            Log.i(TAG, "Aggregate CALORIES DP COUNT: ${it.dataPoints.count()}")
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun readSteps() {
-        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
-        val start = end.minusWeeks(1)
-        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val results = reporter.reader.read(ActivityType.STEP_COUNT_DELTA, startSeconds, endSeconds)
-        results.forEach { aggregateResult ->
-            aggregateResult.dataPoints.forEach {
-                Log.i(TAG, "READ STEPS DP: ${it.json}")
-            }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun aggregateHeartRateBPM() {
-        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
-        val start = end.minusYears(1)
-        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val results = reporter.reader.aggregate(ActivityType.HEART_POINTS_SUMMARY, startSeconds, endSeconds)
-        results.forEach {
-            Log.i(TAG, "Aggregate HR_BPM: ${it.json}")
-        }
-    }
-
-    private fun readDailyTotalSteps() {
-        val results = reporter.reader.readTotalDaily(ActivityType.STEP_COUNT_DELTA)
-        Log.i(TAG, "Daily total STEPS: ${results.json}")
-    }
-
-    private fun readDailyTotalHeartRateBPM() {
-        val results = reporter.reader.readTotalDaily(ActivityType.HEART_RATE_BPM)
-        Log.i(TAG, "Daily total HR_BPM: ${results.json}")
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun insertDataSteps() {
         val end = LocalDateTime.now()
         val start = end.minusHours(1)
-        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochMillisecond()
         val insertResult = InsertResult(
             applicationContext.packageName,
             "steps_on_fly",
-            ActivityType.STEP_COUNT_DELTA,
+            DetailType.STEP_COUNT_DELTA,
             startSeconds,
             endSeconds,
             listOf(InsertResult.Entry(ActivityProperty.STEPS, 999))
@@ -192,20 +134,20 @@ class MainActivity : AppCompatActivity() {
     private fun updateDataSteps() {
         val end = LocalDateTime.now()
         val start = end.minusHours(1)
-        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochMillisecond()
         val insertResult = InsertResult(
             applicationContext.packageName,
             "steps_on_fly",
-            ActivityType.STEP_COUNT_DELTA,
+            DetailType.STEP_COUNT_DELTA,
             startSeconds,
             endSeconds,
             listOf(InsertResult.Entry(ActivityProperty.STEPS, 999))
         )
         val endOfTheDay = LocalDateTime.now().plusHours(1)
         val startOfTheDay = endOfTheDay.minusHours(3)
-        val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
         val isSuccessful = reporter.writer.updateData(insertResult, startOfTheDaySeconds, endOfTheDaySeconds)
         Log.i(TAG, "Update $isSuccessful")
     }
@@ -214,10 +156,13 @@ class MainActivity : AppCompatActivity() {
     private fun deleteDataSteps() {
         val endOfTheDay = LocalDateTime.now().plusHours(2)
         val startOfTheDay = endOfTheDay.minusHours(4)
-        val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochSecond()
-        val isSuccessful = reporter.writer.deleteData(ActivityType.STEP_COUNT_DELTA, startOfTheDaySeconds, endOfTheDaySeconds)
+        val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
+        val isSuccessful = reporter.writer.deleteData(DetailType.STEP_COUNT_DELTA, startOfTheDaySeconds, endOfTheDaySeconds)
         Log.i(TAG, "Delete $isSuccessful")
     }
 
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun ZonedDateTime.toEpochMillisecond() = toEpochSecond() * 1000

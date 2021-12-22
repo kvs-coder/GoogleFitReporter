@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 data class InsertResult(
     val appPackageName: String,
     val streamName: String,
-    val healthType: HealthType,
+    val detailType: DetailType,
     val startTime: Long,
     val endTime: Long,
     val entries: List<Entry>
@@ -27,7 +27,7 @@ data class InsertResult(
 
     @Throws(ClassCastException::class)
     fun asOriginal(): DataSet {
-        val dataType = healthType.asOriginal()
+        val dataType = detailType.asOriginal()
         val dataSource = DataSource.Builder()
             .setAppPackageName(appPackageName)
             .setDataType(dataType)

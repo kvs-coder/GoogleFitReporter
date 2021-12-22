@@ -19,22 +19,83 @@ data class HistoryResult(
         val device: Device?,
         val streamIdentifier: String,
         val streamName: String,
-        val type: Int
+        val type: Type
     ) {
+
+        @Serializable
+        data class Type(val id: Int, val description: String) {
+
+            companion object {
+                internal fun createFrom(type: Int) =
+                    when (type) {
+                        com.google.android.gms.fitness.data.DataSource.TYPE_RAW -> Type(0, "raw")
+                        com.google.android.gms.fitness.data.DataSource.TYPE_DERIVED -> Type(
+                            1,
+                            "derived"
+                        )
+                        else -> Type(
+                            -1,
+                            "unknown"
+                        )
+                    }
+
+            }
+
+        }
 
         @Serializable
         data class Device(
             val manufacturer: String,
             val model: String,
-            val type: Int,
+            val type: Type,
             val uid: String
         ) {
+            @Serializable
+            data class Type(val id: Int, val description: String) {
+
+                companion object {
+                    internal fun createFrom(id: Int) =
+                        when (id) {
+                            com.google.android.gms.fitness.data.Device.TYPE_UNKNOWN -> Type(
+                                0,
+                                "unknown"
+                            )
+                            com.google.android.gms.fitness.data.Device.TYPE_PHONE -> Type(
+                                1,
+                                "phone"
+                            )
+                            com.google.android.gms.fitness.data.Device.TYPE_TABLET -> Type(
+                                2,
+                                "tablet"
+                            )
+                            com.google.android.gms.fitness.data.Device.TYPE_WATCH -> Type(
+                                3,
+                                "watch"
+                            )
+                            com.google.android.gms.fitness.data.Device.TYPE_CHEST_STRAP -> Type(
+                                4,
+                                "chest_strap"
+                            )
+                            com.google.android.gms.fitness.data.Device.TYPE_SCALE -> Type(
+                                5,
+                                "scale"
+                            )
+                            com.google.android.gms.fitness.data.Device.TYPE_HEAD_MOUNTED -> Type(
+                                6,
+                                "head_mounted"
+                            )
+                            else -> Type(-1, "invalid")
+                        }
+                }
+
+            }
+
             companion object {
                 internal fun createFrom(device: com.google.android.gms.fitness.data.Device) =
                     Device(
                         device.manufacturer,
                         device.model,
-                        device.type,
+                        Type.createFrom(device.type),
                         device.uid
                     )
             }
@@ -50,7 +111,7 @@ data class HistoryResult(
                     dataSource.device?.let { Device.createFrom(it) },
                     dataSource.streamIdentifier,
                     dataSource.streamName,
-                    dataSource.type
+                    Type.createFrom(dataSource.type)
                 )
         }
 
@@ -84,13 +145,25 @@ data class HistoryResult(
         data class Entry(val field: Field, val value: Value) {
 
             @Serializable
-            data class Field(val name: String, val format: Int, val isOptional: Boolean?) {
+            data class Format(val id: Int, val description: String) {
+
+                companion object {
+                    internal fun createFrom(format: Int): Format {
+                        val propertyFormat = Property.Format.createFrom(format)
+                        return Format(propertyFormat.id, propertyFormat.name.lowercase())
+                    }
+                }
+
+            }
+
+            @Serializable
+            data class Field(val name: String, val format: Format, val isOptional: Boolean?) {
 
                 companion object {
                     internal fun createFrom(field: com.google.android.gms.fitness.data.Field) =
                         Field(
                             field.name,
-                            field.format,
+                            Format.createFrom(field.format),
                             field.isOptional,
                         )
                 }
@@ -102,7 +175,7 @@ data class HistoryResult(
 
             @Serializable
             data class Value(
-                val format: Int,
+                val format: Format,
                 val isSet: Boolean,
                 val activity: String?,
                 val integer: Int?,
@@ -133,7 +206,7 @@ data class HistoryResult(
                             null
                         }
                         return Value(
-                            value.format,
+                            Format.createFrom(value.format),
                             value.isSet,
                             activity,
                             integer,

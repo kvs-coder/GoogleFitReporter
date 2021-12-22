@@ -1,8 +1,9 @@
 package com.kvs.googlefitreporter.model
 
 import com.google.android.gms.fitness.data.DataType
+import com.google.android.gms.fitness.data.HealthDataTypes
 
-enum class ActivityType(override val string: String, override val properties: List<Property>) :
+enum class DetailType(override val string: String, override val properties: List<Property>) :
     HealthType {
     STEP_COUNT_DELTA(DataType.TYPE_STEP_COUNT_DELTA.name, listOf(ActivityProperty.STEPS)),
     STEP_COUNT_CUMULATIVE(DataType.TYPE_STEP_COUNT_CUMULATIVE.name, listOf(ActivityProperty.STEPS)),
@@ -18,15 +19,6 @@ enum class ActivityType(override val string: String, override val properties: Li
     HEART_RATE_BPM(DataType.TYPE_HEART_RATE_BPM.name, listOf(ActivityProperty.BPM)),
     LOCATION_SAMPLE(
         DataType.TYPE_LOCATION_SAMPLE.name,
-        listOf(
-            ActivityProperty.LATITUDE,
-            ActivityProperty.LONGITUDE,
-            ActivityProperty.ACCURACY,
-            ActivityProperty.ALTITUDE
-        )
-    ),
-    LOCATION_TRACK(
-        DataType.TYPE_LOCATION_TRACK.name,
         listOf(
             ActivityProperty.LATITUDE,
             ActivityProperty.LONGITUDE,
@@ -71,53 +63,58 @@ enum class ActivityType(override val string: String, override val properties: Li
     ),
     MOVE_MINUTES(DataType.TYPE_MOVE_MINUTES.name, listOf(ActivityProperty.DURATION)),
     HEART_POINTS(DataType.TYPE_HEART_POINTS.name, listOf(ActivityProperty.INTENSITY)),
-    ACTIVITY_SUMMARY(
-        DataType.AGGREGATE_ACTIVITY_SUMMARY.name,
-        listOf(ActivityProperty.ACTIVITY, ActivityProperty.DURATION, ActivityProperty.NUM_SEGMENTS)
-    ),
-    BASAL_METABOLIC_RATE_SUMMARY(
-        DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
-    ),
-    HEART_POINTS_SUMMARY(
-        DataType.AGGREGATE_HEART_POINTS.name,
-        listOf(ActivityProperty.INTENSITY, ActivityProperty.DURATION)
-    ),
-    HEART_RATE_SUMMARY(
-        DataType.AGGREGATE_HEART_RATE_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
-    ),
-    LOCATION_BOUNDING_BOX(
-        DataType.AGGREGATE_LOCATION_BOUNDING_BOX.name,
+    BLOOD_PRESSURE(
+        HealthDataTypes.TYPE_BLOOD_PRESSURE.name,
         listOf(
-            ActivityProperty.LOW_LATITUDE,
-            ActivityProperty.LOW_LONGITUDE,
-            ActivityProperty.HIGH_LATITUDE,
-            ActivityProperty.HIGH_LONGITUDE
+            VitalProperty.BLOOD_PRESSURE_SYSTOLIC,
+            VitalProperty.BLOOD_PRESSURE_DIASTOLIC,
+            VitalProperty.BODY_POSITION,
+            VitalProperty.BLOOD_PRESSURE_MEASUREMENT_LOCATION
         )
     ),
-    POWER_SUMMARY(
-        DataType.AGGREGATE_POWER_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
+    BLOOD_GLUCOSE(
+        HealthDataTypes.TYPE_BLOOD_GLUCOSE.name,
+        listOf(
+            VitalProperty.BLOOD_GLUCOSE_LEVEL,
+            VitalProperty.TEMPORAL_RELATION_TO_MEAL,
+            ActivityProperty.MEAL_TYPE,
+            VitalProperty.TEMPORAL_RELATION_TO_SLEEP,
+            VitalProperty.BLOOD_GLUCOSE_SPECIMEN_SOURCE
+        )
     ),
-    SPEED_SUMMARY(
-        DataType.AGGREGATE_SPEED_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
+    OXYGEN_SATURATION(
+        HealthDataTypes.TYPE_OXYGEN_SATURATION.name,
+        listOf(
+            VitalProperty.OXYGEN_SATURATION,
+            VitalProperty.SUPPLEMENTAL_OXYGEN_FLOW_RATE,
+            VitalProperty.OXYGEN_THERAPY_ADMINISTRATION_MODE,
+            VitalProperty.OXYGEN_SATURATION_SYSTEM,
+            VitalProperty.OXYGEN_SATURATION_MEASUREMENT_METHOD
+        )
     ),
-    BODY_FAT_PERCENTAGE_SUMMARY(
-        DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
+    BODY_TEMPERATURE(
+        HealthDataTypes.TYPE_BODY_TEMPERATURE.name,
+        listOf(VitalProperty.BODY_TEMPERATURE, VitalProperty.BODY_TEMPERATURE_MEASUREMENT_LOCATION)
     ),
-    WEIGHT_SUMMARY(
-        DataType.AGGREGATE_WEIGHT_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
+    CERVICAL_MUCUS(
+        HealthDataTypes.TYPE_CERVICAL_MUCUS.name,
+        listOf(VitalProperty.CERVICAL_MUCUS_TEXTURE, VitalProperty.CERVICAL_MUCUS_AMOUNT)
     ),
-    HEIGHT_SUMMARY(
-        DataType.AGGREGATE_HEIGHT_SUMMARY.name,
-        listOf(ActivityProperty.AVERAGE, ActivityProperty.MAX, ActivityProperty.MIN)
+    CERVICAL_POSITION(
+        HealthDataTypes.TYPE_CERVICAL_POSITION.name,
+        listOf(
+            VitalProperty.CERVICAL_POSITION,
+            VitalProperty.CERVICAL_DILATION,
+            VitalProperty.CERVICAL_FIRMNESS
+        )
     ),
-    NUTRITION_SUMMARY(
-        DataType.AGGREGATE_NUTRITION_SUMMARY.name,
-        listOf(ActivityProperty.NUTRIENTS, ActivityProperty.MEAL_TYPE)
+    MENSTRUATION(HealthDataTypes.TYPE_MENSTRUATION.name, listOf(VitalProperty.MENSTRUAL_FLOW)),
+    OVULATION_TEST(
+        HealthDataTypes.TYPE_OVULATION_TEST.name,
+        listOf(VitalProperty.OVULATION_TEST_RESULT)
+    ),
+    VAGINAL_SPOTTING(
+        HealthDataTypes.TYPE_VAGINAL_SPOTTING.name,
+        listOf(ActivityProperty.OCCURRENCES)
     );
 }

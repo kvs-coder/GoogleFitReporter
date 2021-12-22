@@ -22,6 +22,7 @@ interface Property {
                 else -> throw GoogleFitDataTypeException("Unknown format: $id")
             }
         }
+
     }
 
     val string: String

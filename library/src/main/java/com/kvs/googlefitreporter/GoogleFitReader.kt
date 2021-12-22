@@ -4,6 +4,7 @@ import android.app.Activity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.tasks.Tasks
+import com.kvs.googlefitreporter.model.AggregateType
 import com.kvs.googlefitreporter.model.HistoryResult
 import com.kvs.googlefitreporter.model.HealthType
 import com.kvs.googlefitreporter.resolver.ResolverFactory
@@ -18,11 +19,11 @@ class GoogleFitReader(
      */
     @Throws(IllegalStateException::class)
     fun aggregate(
-        healthType: HealthType,
+        aggregateType: AggregateType,
         startTime: Long,
         endTime: Long
     ): List<HistoryResult> {
-        val readRequest = ResolverFactory.create().createAggregateRequest(healthType, startTime, endTime)
+        val readRequest = ResolverFactory.create().createAggregateRequest(aggregateType, startTime, endTime)
         val task = Fitness.getHistoryClient(activity, account).readData(readRequest)
         val response = Tasks.await(task).buckets
         return response

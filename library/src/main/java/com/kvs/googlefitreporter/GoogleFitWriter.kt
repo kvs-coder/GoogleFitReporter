@@ -4,6 +4,7 @@ import android.app.Activity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.tasks.Tasks
+import com.kvs.googlefitreporter.model.DetailType
 import com.kvs.googlefitreporter.model.HealthType
 import com.kvs.googlefitreporter.model.InsertResult
 import com.kvs.googlefitreporter.resolver.ResolverFactory
@@ -35,11 +36,11 @@ class GoogleFitWriter(
 
     @Throws(IllegalStateException::class)
     fun deleteData(
-        healthType: HealthType,
+        detailType: DetailType,
         startTime: Long,
         endTime: Long
     ): Boolean {
-        val request = ResolverFactory.create().createDataDeleteRequest(healthType, startTime, endTime)
+        val request = ResolverFactory.create().createDataDeleteRequest(detailType, startTime, endTime)
         val task = Fitness.getHistoryClient(activity, account).deleteData(request)
         Tasks.await(task)
         return task.isSuccessful

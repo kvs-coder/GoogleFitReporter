@@ -4,10 +4,7 @@ import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataDeleteRequest
 import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.android.gms.fitness.request.DataUpdateRequest
-import com.kvs.googlefitreporter.model.HistoryResult
-import com.kvs.googlefitreporter.model.ActivityType
-import com.kvs.googlefitreporter.model.HealthType
-import com.kvs.googlefitreporter.model.InsertResult
+import com.kvs.googlefitreporter.model.*
 import java.util.concurrent.TimeUnit
 
 internal class Resolver : CommonResolver {
@@ -21,17 +18,17 @@ internal class Resolver : CommonResolver {
         endTime: Long
     ): DataUpdateRequest = DataUpdateRequest.Builder()
         .setDataSet(insertResult.asOriginal())
-        .setTimeInterval(startTime, endTime, TimeUnit.SECONDS)
+        .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
         .build()
 
     override fun createDataDeleteRequest(
-        healthType: HealthType,
+        detailType: DetailType,
         startTime: Long,
         endTime: Long
     ): DataDeleteRequest =
         DataDeleteRequest.Builder()
-            .setTimeInterval(startTime, endTime, TimeUnit.SECONDS)
-            .addDataType(healthType.asOriginal())
+            .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
+            .addDataType(detailType.asOriginal())
             .build()
 
     override fun createReadRequest(
@@ -40,28 +37,28 @@ internal class Resolver : CommonResolver {
         endTime: Long
     ): DataReadRequest = DataReadRequest.Builder()
         .read(healthType.asOriginal())
-        .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
+        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
         .build()
 
     override fun createAggregateRequest(
-        healthType: HealthType,
+        aggregateType: AggregateType,
         startTime: Long,
         endTime: Long
     ): DataReadRequest = DataReadRequest.Builder()
         .apply {
-            if (healthType == ActivityType.STEP_COUNT_DELTA) {
+            if (aggregateType == AggregateType.STEP_COUNT_DELTA) {
                 val datasource = DataSource.Builder()
                     .setAppPackageName(HistoryResult.APP_PACKAGE_NAME)
-                    .setDataType(healthType.asOriginal())
+                    .setDataType(aggregateType.asOriginal())
                     .setType(DataSource.TYPE_DERIVED)
                     .setStreamName(HistoryResult.STEPS_STREAM_NAME)
                     .build()
                 aggregate(datasource)
             } else {
-                aggregate(healthType.asOriginal())
+                aggregate(aggregateType.asOriginal())
             }
         }
-        .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
+        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
         .bucketByTime(1, TimeUnit.DAYS)
         .build()
 }
