@@ -17,6 +17,8 @@ interface CommonResolver {
         endTime: Long
     ): DataUpdateRequest
 
+    fun createReadRequest(healthType: HealthType, startTime: Long, endTime: Long): DataReadRequest
+
     fun createAggregateRequest(healthType: HealthType, startTime: Long, endTime: Long): DataReadRequest
 
     fun createDataDeleteRequest(healthType: HealthType, startTime: Long, endTime: Long): DataDeleteRequest

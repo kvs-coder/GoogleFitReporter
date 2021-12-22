@@ -7,14 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.google.android.gms.fitness.data.DataType
-import com.google.android.gms.fitness.data.Field
 import com.kvs.googlefitreporter.GoogleFitManager.Companion.GOOGLE_FIT_REPORTER_PERMISSIONS_REQUEST_CODE
 import com.kvs.googlefitreporter.GoogleFitReporter
 import com.kvs.googlefitreporter.model.ActivityProperty
 import com.kvs.googlefitreporter.model.ActivityType
 import com.kvs.googlefitreporter.model.InsertResult
-import com.kvs.googlefitreporter.model.Property
 import java.lang.Exception
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -33,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         reporter = GoogleFitReporter(this)
         reporter.manager.authorize(
             toReadTypes = setOf(
@@ -41,6 +39,7 @@ class MainActivity : AppCompatActivity() {
                 ActivityType.HEART_POINTS,
                 ActivityType.HEART_POINTS_SUMMARY,
                 ActivityType.HEART_RATE_SUMMARY,
+                ActivityType.CALORIES_EXPENDED,
             ),
             toWriteTypes = setOf(ActivityType.STEP_COUNT_DELTA, ActivityType.HEART_RATE_BPM)
         )
@@ -95,10 +94,13 @@ class MainActivity : AppCompatActivity() {
     private fun getGFitData() {
         thread {
             try {
-                readDailyTotalSteps()
-                aggregateSteps()
+                //readSteps()
+                //readDailyTotalSteps()
+                //aggregateSteps()
                 //readDailyTotalHeartRateBPM()
                 //aggregateHeartRateBPM()
+
+                aggregateCalories()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -115,6 +117,34 @@ class MainActivity : AppCompatActivity() {
         val results = reporter.reader.aggregate(ActivityType.STEP_COUNT_DELTA, startSeconds, endSeconds)
         results.forEach {
             Log.i(TAG, "Aggregate STEPS: ${it.json}")
+            Log.i(TAG, "Aggregate DP COUNT: ${it.dataPoints.count()}")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun aggregateCalories() {
+        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
+        val start = end.minusYears(1)
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val results = reporter.reader.aggregate(ActivityType.CALORIES_EXPENDED, startSeconds, endSeconds)
+        results.forEach {
+            Log.i(TAG, "Aggregate CALORIES: ${it.json}")
+            Log.i(TAG, "Aggregate CALORIES DP COUNT: ${it.dataPoints.count()}")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun readSteps() {
+        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
+        val start = end.minusWeeks(1)
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val results = reporter.reader.read(ActivityType.STEP_COUNT_DELTA, startSeconds, endSeconds)
+        results.forEach { aggregateResult ->
+            aggregateResult.dataPoints.forEach {
+                Log.i(TAG, "READ STEPS DP: ${it.json}")
+            }
         }
     }
 

@@ -7,7 +7,7 @@ import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 @Serializable
-data class AggregateResult(
+data class HistoryResult(
     val dataSource: DataSource,
     val dataType: DataType,
     val dataPoints: List<DataPoint>,
@@ -38,6 +38,9 @@ data class AggregateResult(
                         device.uid
                     )
             }
+
+            val json: String
+                get() = Json.encodeToString(this)
         }
 
         companion object {
@@ -51,6 +54,9 @@ data class AggregateResult(
                 )
         }
 
+        val json: String
+            get() = Json.encodeToString(this)
+
     }
 
     @Serializable
@@ -60,6 +66,9 @@ data class AggregateResult(
             internal fun createFrom(dataType: com.google.android.gms.fitness.data.DataType) =
                 DataType(dataType.name)
         }
+
+        val json: String
+            get() = Json.encodeToString(this)
 
     }
 
@@ -85,6 +94,9 @@ data class AggregateResult(
                             field.isOptional,
                         )
                 }
+
+                val json: String
+                    get() = Json.encodeToString(this)
 
             }
 
@@ -131,6 +143,9 @@ data class AggregateResult(
                     }
                 }
 
+                val json: String
+                    get() = Json.encodeToString(this)
+
             }
 
             companion object {
@@ -142,6 +157,9 @@ data class AggregateResult(
                     Value.createFrom(value)
                 )
             }
+
+            val json: String
+                get() = Json.encodeToString(this)
 
         }
 
@@ -157,6 +175,9 @@ data class AggregateResult(
             )
         }
 
+        val json: String
+            get() = Json.encodeToString(this)
+
     }
 
     companion object {
@@ -165,7 +186,7 @@ data class AggregateResult(
 
         internal fun createFrom(
             dataSet: com.google.android.gms.fitness.data.DataSet,
-        ) = AggregateResult(
+        ) = HistoryResult(
             DataSource.createFrom(dataSet.dataSource),
             DataType.createFrom(dataSet.dataType),
             dataSet.dataPoints.map { DataPoint.createFrom(it) }
@@ -174,5 +195,6 @@ data class AggregateResult(
 
     val json: String
         get() = Json.encodeToString(this)
+
 }
 
