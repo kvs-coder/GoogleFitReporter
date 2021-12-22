@@ -4,7 +4,7 @@ import android.app.Activity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.fitness.FitnessOptions
-import com.google.android.gms.fitness.data.DataType
+import com.kvs.googlefitreporter.model.HealthType
 
 class GoogleFitManager(private val activity: Activity) {
 
@@ -17,12 +17,12 @@ class GoogleFitManager(private val activity: Activity) {
     lateinit var account: GoogleSignInAccount
 
     fun authorize(
-        toReadTypes: Set<DataType>,
-        toWriteTypes: Set<DataType>
+        toReadTypes: Set<HealthType>,
+        toWriteTypes: Set<HealthType>
     ) {
         fitnessOptions = FitnessOptions.builder().apply {
-            toReadTypes.forEach { addDataType(it, FitnessOptions.ACCESS_READ) }
-            toWriteTypes.forEach { addDataType(it, FitnessOptions.ACCESS_WRITE) }
+            toReadTypes.forEach { addDataType(it.asOriginal(), FitnessOptions.ACCESS_READ) }
+            toWriteTypes.forEach { addDataType(it.asOriginal(), FitnessOptions.ACCESS_WRITE) }
         }.build()
         account = GoogleSignIn.getAccountForExtension(activity, fitnessOptions)
     }

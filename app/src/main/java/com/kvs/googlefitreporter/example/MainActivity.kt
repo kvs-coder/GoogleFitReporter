@@ -36,15 +36,18 @@ class MainActivity : AppCompatActivity() {
         reporter = GoogleFitReporter(this)
         reporter.manager.authorize(
             toReadTypes = setOf(
-                DataType.AGGREGATE_STEP_COUNT_DELTA,
-                DataType.TYPE_STEP_COUNT_DELTA
+                ActivityType.STEP_COUNT_DELTA,
+                ActivityType.HEART_RATE_BPM,
+                ActivityType.HEART_POINTS,
+                ActivityType.HEART_POINTS_SUMMARY,
+                ActivityType.HEART_RATE_SUMMARY,
             ),
-            toWriteTypes = setOf(DataType.AGGREGATE_STEP_COUNT_DELTA)
+            toWriteTypes = setOf(ActivityType.STEP_COUNT_DELTA, ActivityType.HEART_RATE_BPM)
         )
         if (reporter.manager.hasPermissions()) {
             getGFitData()
-            saveGFitData()
-            deleteGFitData()
+            //saveGFitData()
+            //deleteGFitData()
         } else {
             reporter.manager.requestPermissions()
         }
@@ -92,8 +95,10 @@ class MainActivity : AppCompatActivity() {
     private fun getGFitData() {
         thread {
             try {
-                readDailyTotalSteps()
-                aggregateSteps()
+                //readDailyTotalSteps()
+                //aggregateSteps()
+                readDailyTotalHeartRateBPM()
+                aggregateHeartRateBPM()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -109,13 +114,30 @@ class MainActivity : AppCompatActivity() {
         val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
         val results = reporter.reader.aggregate(ActivityType.STEP_COUNT_DELTA, startSeconds, endSeconds)
         results.forEach {
-            Log.i(TAG, "Aggregate ${it.json}")
+            Log.i(TAG, "Aggregate STEPS: ${it.json}")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun aggregateHeartRateBPM() {
+        val end = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)
+        val start = end.minusYears(1)
+        val endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond()
+        val results = reporter.reader.aggregate(ActivityType.HEART_POINTS_SUMMARY, startSeconds, endSeconds)
+        results.forEach {
+            Log.i(TAG, "Aggregate HR_BPM: ${it.json}")
         }
     }
 
     private fun readDailyTotalSteps() {
         val results = reporter.reader.readTotalDaily(ActivityType.STEP_COUNT_DELTA)
-        Log.i(TAG, "Daily total ${results.json}")
+        Log.i(TAG, "Daily total STEPS: ${results.json}")
+    }
+
+    private fun readDailyTotalHeartRateBPM() {
+        val results = reporter.reader.readTotalDaily(ActivityType.HEART_RATE_BPM)
+        Log.i(TAG, "Daily total HR_BPM: ${results.json}")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
