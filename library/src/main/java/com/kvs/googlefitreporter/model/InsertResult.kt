@@ -3,8 +3,14 @@ package com.kvs.googlefitreporter.model
 import com.google.android.gms.fitness.data.DataPoint
 import com.google.android.gms.fitness.data.DataSet
 import com.google.android.gms.fitness.data.DataSource
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.concurrent.TimeUnit
 
+@Serializable
 data class InsertResult(
     val appPackageName: String,
     val streamName: String,
@@ -14,7 +20,13 @@ data class InsertResult(
     val entries: List<Entry>
 ) {
 
-    data class Entry(val property: Property, val value: Any) {
+    @Serializable
+    data class Entry(val property: Property, @Contextual val value: Any) {
+
+        companion object {
+            fun createFrom(json: String) = Json.decodeFromString<Entry>(json)
+        }
+
         val integer: Int
             get() = value as Int
         val float: Float
@@ -23,7 +35,17 @@ data class InsertResult(
             get() = value as String
         val map: Map<String, Float>
             get() = value as Map<String, Float>
+
+        val json: String
+            get() = Json.encodeToString(this)
     }
+
+    companion object {
+        fun createFrom(json: String) = Json.decodeFromString<InsertResult>(json)
+    }
+
+    val json: String
+        get() = Json.encodeToString(this)
 
     @Throws(ClassCastException::class)
     fun asOriginal(): DataSet {

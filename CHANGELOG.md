@@ -1,3 +1,8 @@
+## [0.0.3] - 12.03.2022.
+
+* Change errors
+* Provide from Json static factories for InsertResult
+
 ## [0.0.2] - 12.03.2022.
 
 * Combine authorize and hasPermissions
