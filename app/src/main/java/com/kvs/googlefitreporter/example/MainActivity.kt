@@ -30,11 +30,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         reporter = GoogleFitReporter(this)
-        reporter.manager.authorize(
-            toReadTypes = AggregateType.values().toSet(),
-            toWriteTypes = DetailType.values().toSet()
-        )
-        if (reporter.manager.hasPermissions()) {
+
+        if (reporter.manager.hasPermissions(AggregateType.values().toSet(), DetailType.values().toSet())) {
             getGFitData()
             saveGFitData()
             deleteGFitData()

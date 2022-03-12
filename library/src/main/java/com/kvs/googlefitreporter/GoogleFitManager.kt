@@ -16,19 +16,16 @@ class GoogleFitManager(private val activity: Activity) {
 
     lateinit var account: GoogleSignInAccount
 
-    fun authorize(
+    @Throws(GoogleFitRequestPermissionsException::class)
+    fun hasPermissions(
         toReadTypes: Set<HealthType>,
         toWriteTypes: Set<HealthType>
-    ) {
+    ): Boolean {
         fitnessOptions = FitnessOptions.builder().apply {
             toReadTypes.forEach { addDataType(it.asOriginal(), FitnessOptions.ACCESS_READ) }
             toWriteTypes.forEach { addDataType(it.asOriginal(), FitnessOptions.ACCESS_WRITE) }
         }.build()
         account = GoogleSignIn.getAccountForExtension(activity, fitnessOptions)
-    }
-
-    @Throws(GoogleFitRequestPermissionsException::class)
-    fun hasPermissions(): Boolean {
         if (!this::account.isInitialized || !this::fitnessOptions.isInitialized) {
             throw GoogleFitRequestPermissionsException("Authorize first")
         }
