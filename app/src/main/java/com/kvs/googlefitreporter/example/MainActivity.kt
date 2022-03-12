@@ -123,8 +123,8 @@ class MainActivity : AppCompatActivity() {
             endSeconds,
             listOf(InsertResult.Entry(ActivityProperty.STEPS, 999))
         )
-        val isSuccessful = reporter.writer.insertData(insertResult)
-        Log.i(TAG, "Insert $isSuccessful")
+        val isSuccessful = reporter.writer.insert(insertResult)
+        Log.i(TAG, "Insert $isSuccessful, data: ${insertResult.json}")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -145,8 +145,8 @@ class MainActivity : AppCompatActivity() {
         val startOfTheDay = endOfTheDay.minusHours(3)
         val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
         val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
-        val isSuccessful = reporter.writer.updateData(insertResult, startOfTheDaySeconds, endOfTheDaySeconds)
-        Log.i(TAG, "Update $isSuccessful")
+        val isSuccessful = reporter.writer.update(insertResult, startOfTheDaySeconds, endOfTheDaySeconds)
+        Log.i(TAG, "Update $isSuccessful, data: ${insertResult.json}")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         val startOfTheDay = endOfTheDay.minusHours(4)
         val endOfTheDaySeconds = endOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
         val startOfTheDaySeconds = startOfTheDay.atZone(ZoneId.systemDefault()).toEpochMillisecond()
-        val isSuccessful = reporter.writer.deleteData(DetailType.STEP_COUNT_DELTA, startOfTheDaySeconds, endOfTheDaySeconds)
+        val isSuccessful = reporter.writer.delete(DetailType.STEP_COUNT_DELTA, startOfTheDaySeconds, endOfTheDaySeconds)
         Log.i(TAG, "Delete $isSuccessful")
     }
 

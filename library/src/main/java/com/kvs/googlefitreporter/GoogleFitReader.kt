@@ -8,6 +8,7 @@ import com.kvs.googlefitreporter.model.AggregateType
 import com.kvs.googlefitreporter.model.HistoryResult
 import com.kvs.googlefitreporter.model.HealthType
 import com.kvs.googlefitreporter.resolver.ResolverFactory
+import java.util.concurrent.ExecutionException
 
 class GoogleFitReader(
     private val activity: Activity,
@@ -17,7 +18,7 @@ class GoogleFitReader(
     /**
      * Aggregates data points in a single result
      */
-    @Throws(IllegalStateException::class)
+    @Throws(ExecutionException::class, InterruptedException::class)
     fun aggregate(
         aggregateType: AggregateType,
         startTime: Long,
@@ -34,7 +35,7 @@ class GoogleFitReader(
     /**
      * Read every data point separately
      */
-    @Throws(IllegalStateException::class)
+    @Throws(ExecutionException::class, InterruptedException::class)
     fun read(
         healthType: HealthType,
         startTime: Long,
@@ -46,7 +47,7 @@ class GoogleFitReader(
         return response.dataSets.map { HistoryResult.createFrom(it) }
     }
 
-    @Throws(IllegalStateException::class)
+    @Throws(ExecutionException::class, InterruptedException::class)
     fun readTotalDaily(healthType: HealthType): HistoryResult {
         val task = Fitness.getHistoryClient(activity, account).readDailyTotal(healthType.asOriginal())
         val response = Tasks.await(task)
